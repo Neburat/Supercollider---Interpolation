@@ -24,9 +24,11 @@ Interpol {
 	call { | inpB, time, inCurve |
 		var mapLo;
 
+		x = 1;
 		storeInpB = inpB;
+
 		if (inCurve.notNil) { curve = inCurve };
-		if (inpB.notNil) { inB = inpB };
+		if (inpB.notNil) { inA = interp; inB = inpB };
 		if (time.notNil) {
 			resolution = time * 100.0;
 			timeStep = time * 0.001;
@@ -35,7 +37,6 @@ Interpol {
 
 		case
 		{curve == "lin"}  {
-
 			mapLo = 0 ;
 			r = Routine {
 				var i = 0, a = 0;
@@ -53,12 +54,11 @@ Interpol {
 		}
 
 		{curve == "exp"} {
-
 			mapLo = 0.0001 ;
 			r = Routine {
 				var i = 0, a = 0;
 				inf.do{
-					while({ i < resolution },{
+					while( { i < resolution },{
 						if(x == 1) {i = i + 1;  a = a + 1} { i = resolution};
 						timeStep.wait;
 						interp = blend(inA,inB,a.expexp(mapLo,resolution,mapLo,1.0));
