@@ -43,7 +43,7 @@ Interpol{
 		);
 
 		if (
-			time.notNil ,{this.resolution = time*100.0;this.timeStep = time*0.001; this.storeTime = time}
+			time.notNil ,{this.resolution = time*100.0;this.timeStep = time*0.001},{time = this.storeTime;this.resolution = time*100.0;this.timeStep = time*0.001}
 		);
 
 		if (this.curve == "lin")  {
