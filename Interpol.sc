@@ -1,28 +1,40 @@
-// ---- An even more economic version --- but will not work with previous code since callPrint was replaced
-// for a boolean:
+// ---- An even more economic version ---
+// Added a mechanism for being able to call several times without overlapping Routines
 
 Interpol {
 	var <>r,<>interp, >inA,>inB,>time, <>callPrint;
-	var <>resolution,<>timeStep,<>curve,<>x,<>storeTime,<>storeInpB;
+	var <>resolution,<>timeStep,<>curve,<>x,<>storeTime,<>storeInpB, <>isRunning;
 
-	*new{ | inpA,time, inCurve |
-		^super.new.init( inpA, time, inCurve);
+	*new{ | inpA |
+		^super.new.init( inpA );
 	}
 
-	init{ | inpA,time, inCurve |
+	init { | inpA |
 
 		inA = inB = interp = inpA;
 		x = 1;
-		storeTime = time;
-		curve = inCurve ? "lin";
-		resolution = time*100.0;
-		timeStep = time*0.001;
+		if (time.isNil) { time = 10};
+		storeTime = 10;
+		curve = "lin";
+		resolution = time * 50;
+		timeStep = time * 0.001;
 		callPrint = false;
+		isRunning = false; //Check if it's running
 	}
 
+
+	call { |inpB, time, inCurve|
+		if (isRunning.not) {
+			this.run(inpB, time, inCurve);
+		} { this.callStop; r.stop; r.free; this.run(inpB, time, inCurve) }
+	}
+
+
 	//Print result
-	call { | inpB, time, inCurve |
+	run { | inpB, time, inCurve |
 		var mapLo;
+		isRunning = true;
+		//If it was playing, stop it and start a new one from where it left
 
 		x = 1;
 		storeInpB = inpB;
@@ -30,7 +42,7 @@ Interpol {
 		if (inCurve.notNil) { curve = inCurve };
 		if (inpB.notNil) { inA = interp; inB = inpB };
 		if (time.notNil) {
-			resolution = time * 100.0;
+			resolution = time * 50;
 			timeStep = time * 0.001;
 			storeTime = time;
 		};
@@ -48,7 +60,8 @@ Interpol {
 						if (callPrint) { this.printCalls };
 					});
 					"done".postln;
-					r.stop
+					r.stop;
+					isRunning = false;
 				}
 			}.play
 		}
@@ -65,10 +78,14 @@ Interpol {
 						if (callPrint) { this.printCalls };
 					});
 					"done".postln;
-					r.stop
+					r.stop;
+					isRunning = false;
 				}
 			}.play
 		}
+
+
+
 	}
 
 	printCalls {
@@ -78,12 +95,13 @@ Interpol {
 	///stop, restart & getState
 	callStop{
 		x = 0;
+		isRunning = false;
 		"currentState".postln;
 		^interp;
 	}
 
 	callGo{
-		this.call(storeInpB, storeTime);
+		this.run(storeInpB, storeTime);
 	}
 
 	getState{
