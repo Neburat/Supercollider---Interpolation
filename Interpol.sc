@@ -1,5 +1,4 @@
-// ---- An even more economic version --- but will not work with previous code since callPrint was replaced
-// for a boolean:
+//Interpol 2 -Ft Darien
 
 Interpol {
 	var <>r,<>interp, >inA,>inB,>time, <>callPrint;
@@ -13,9 +12,10 @@ Interpol {
 
 		inA = inB = interp = inpA;
 		x = 1;
+		if(time.isNil) {time = 10};  //def time  10 sec
 		storeTime = time;
-		curve = inCurve ? "lin";
-		resolution = time*100.0;
+		curve = inCurve ? "lin";     //def curve
+		resolution = time*50;
 		timeStep = time*0.001;
 		callPrint = false;
 	}
@@ -24,19 +24,22 @@ Interpol {
 	call { | inpB, time, inCurve |
 		var mapLo;
 
+
 		x = 1;
 		storeInpB = inpB;
-
 		if (inCurve.notNil) { curve = inCurve };
-		if (inpB.notNil) { inA = interp; inB = inpB };
+		if (inpB.notNil) { inB = inpB; inA = interp; };
 		if (time.notNil) {
-			resolution = time * 100.0;
-			timeStep = time * 0.001;
+			resolution = time*50;
+			timeStep = time*0.001;
 			storeTime = time;
 		};
 
+
+
 		case
 		{curve == "lin"}  {
+
 			mapLo = 0 ;
 			r = Routine {
 				var i = 0, a = 0;
@@ -54,11 +57,12 @@ Interpol {
 		}
 
 		{curve == "exp"} {
+
 			mapLo = 0.0001 ;
 			r = Routine {
 				var i = 0, a = 0;
 				inf.do{
-					while( { i < resolution },{
+					while({ i < resolution },{
 						if(x == 1) {i = i + 1;  a = a + 1} { i = resolution};
 						timeStep.wait;
 						interp = blend(inA,inB,a.expexp(mapLo,resolution,mapLo,1.0));
@@ -79,15 +83,16 @@ Interpol {
 	callStop{
 		x = 0;
 		"currentState".postln;
+		r.stop;
 		^interp;
 	}
 
 	callGo{
+		this.callStop;
 		this.call(storeInpB, storeTime);
 	}
 
 	getState{
-		"currentState".postln;
 		^interp;
 	}
 
