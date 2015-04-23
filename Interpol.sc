@@ -24,6 +24,7 @@ Interpol {
 	call { | inpB, time, inCurve |
 		var mapLo;
 
+		r.stop;
 
 		x = 1;
 		storeInpB = inpB;
