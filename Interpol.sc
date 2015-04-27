@@ -3,7 +3,7 @@
 // Added different interpolation types
 // Added a method to query interpolation types
 
-Interpol {
+Interpol2 {
 	var <>r,<>interp, >inA,>inB,>time, <>callPrint;
 	var <>resolution,<>timeStep,<>curve,<>x,<>storeTime,<>storeInpB;
 
